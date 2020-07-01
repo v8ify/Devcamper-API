@@ -5,13 +5,13 @@ const bootcampSchema = new mongoose.Schema({
     type: String,
     unique: true,
     trim: true,
-    required: [true, "Please provide a name"],
+    required: [true, "Please add a name"],
     maxlength: [50, "name cannot be more than 50 characters"],
   },
   slug: { type: String },
   description: {
     type: String,
-    required: true,
+    required: [true, "Please add a description"],
     maxlength: [500, "Description cannot be more than 500 characters"],
   },
   website: {
@@ -31,6 +31,10 @@ const bootcampSchema = new mongoose.Schema({
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       "Please add a valid email",
     ],
+  },
+  address: {
+    type: String,
+    required: [true, "Please add an address"],
   },
   location: {
     // GeoJSON Point
