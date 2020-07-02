@@ -68,3 +68,50 @@ exports.createCourse = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc      Update single course by courseId
+// @route     PUT /api/v1/courses/:id
+// @access    Private
+exports.updateCourse = async (req, res, next) => {
+  try {
+    let course = await Course.findById(req.params.id);
+
+    if (!course) {
+      throw new errorResponse(
+        `Couldn't find course with id ${req.params.bootcampId}`,
+        400
+      );
+    }
+
+    course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({ success: true, data: course });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc      Delete single course by courseId
+// @route     DELETE /api/v1/courses/:id
+// @access    Private
+exports.deleteCourse = async (req, res, next) => {
+  try {
+    let course = await Course.findById(req.params.id);
+
+    if (!course) {
+      throw new errorResponse(
+        `Couldn't find course with id ${req.params.bootcampId}`,
+        400
+      );
+    }
+
+    await course.remove();
+
+    res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    next(error);
+  }
+};
