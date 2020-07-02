@@ -10,7 +10,7 @@ exports.getBootcamps = async (req, res, next) => {
   let queryObj = { ...req.query };
 
   // removing specific fields from query to deal with them in different manner
-  let removedFields = ["select", "sort"];
+  let removedFields = ["select", "sort", "page", "limit"];
   removedFields.forEach(param => delete queryObj[param]);
 
   let queryStr = JSON.stringify(queryObj);
@@ -32,13 +32,41 @@ exports.getBootcamps = async (req, res, next) => {
     sortBy = "-createdAt";
   }
 
+  // Skip
+  let page = parseInt(req.query.page, 10) || 1;
+  let limit = parseInt(req.query.limit, 10) || 25;
+  let itemsToSkip = (page - 1) * limit;
+  let endIndex = page * limit;
+  let total = await Bootcamp.countDocuments();
+
+  // showing prev and next page numbers
+  let pagination = {};
+  if (endIndex < total) {
+    pagination.next = {
+      page: page + 1,
+      limit,
+    };
+  }
+
+  if (itemsToSkip > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit,
+    };
+  }
+
   try {
     const bootcamps = await Bootcamp.find(JSON.parse(queryStr))
       .select(`${selectedParams}`)
-      .sort(sortBy);
-    res
-      .status(200)
-      .json({ success: true, count: bootcamps.length, data: bootcamps });
+      .sort(sortBy)
+      .skip(itemsToSkip)
+      .limit(limit);
+    res.status(200).json({
+      success: true,
+      count: bootcamps.length,
+      pagination,
+      data: bootcamps,
+    });
   } catch (err) {
     next(err);
   }
