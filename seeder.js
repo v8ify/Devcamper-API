@@ -26,7 +26,7 @@ const courses = JSON.parse(
 const insertData = async () => {
   try {
     await Bootcamp.create(bootcamps);
-    await Course.create(courses);
+    // await Course.create(courses);
     console.log("Data inserted...".green.inverse);
     process.exit();
   } catch (error) {
